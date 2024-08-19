@@ -1,10 +1,12 @@
-package increment_routes
+package incrementroutes
 
 import (
 	"github.com/bryopsida/gofiber-pug-starter/interfaces"
 	"github.com/gofiber/fiber/v2"
 )
 
+// RegisterRoutes registers increment routes
+// - app: *fiber.App fiber app
 func RegisterRoutes(app *fiber.App, service interfaces.IIncrementService) {
 
 	app.Post("/increment", func(c *fiber.Ctx) error {

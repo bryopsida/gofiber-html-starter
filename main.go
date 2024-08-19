@@ -9,22 +9,27 @@ import (
 	"syscall"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/template/pug/v2"
 
 	"github.com/bryopsida/gofiber-pug-starter/config"
 	"github.com/bryopsida/gofiber-pug-starter/datastore"
 	"github.com/bryopsida/gofiber-pug-starter/interfaces"
+	"github.com/bryopsida/gofiber-pug-starter/pages"
 	"github.com/bryopsida/gofiber-pug-starter/repositories/number"
-	increment_routes "github.com/bryopsida/gofiber-pug-starter/routes/increment"
+	incrementroutes "github.com/bryopsida/gofiber-pug-starter/routes/increment"
 	"github.com/bryopsida/gofiber-pug-starter/services/increment"
 )
 
-func buildConfig() fiber.Config {
+func buildConfig(view *pug.Engine) fiber.Config {
 	return fiber.Config{
-		ErrorHandler: func(c *fiber.Ctx, err error) error {
-			slog.Error("Error", "error", err)
-			return c.Status(500).JSON(fiber.Map{"error": err.Error()})
-		},
+		Views: view,
 	}
+}
+
+func buildViewEngine() *pug.Engine {
+	engine := pug.New("./views", ".pug")
+	engine.Load()
+	return engine
 }
 
 func buildApp(config fiber.Config) *fiber.App {
@@ -69,9 +74,15 @@ func main() {
 	// ensure this is always called on func exit
 	defer cancel()
 
-	app := buildApp(buildConfig())
+	appViews := buildViewEngine()
+	appConfig := buildConfig(appViews)
+	app := buildApp(appConfig)
+
 	slog.Info("Registering routes")
-	increment_routes.RegisterRoutes(app, service)
+	incrementroutes.RegisterRoutes(app, service)
+
+	slog.Info("Registering global pages")
+	pages.RegisterGlobalPages(app)
 
 	startServer(app, config)
 
