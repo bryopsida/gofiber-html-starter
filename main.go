@@ -24,6 +24,7 @@ import (
 
 	"github.com/bryopsida/gofiber-pug-starter/config"
 	"github.com/bryopsida/gofiber-pug-starter/datastore"
+	_ "github.com/bryopsida/gofiber-pug-starter/docs"
 	"github.com/bryopsida/gofiber-pug-starter/interfaces"
 	"github.com/bryopsida/gofiber-pug-starter/pages"
 	"github.com/bryopsida/gofiber-pug-starter/repositories/number"
@@ -116,6 +117,9 @@ func main() {
 
 	slog.Info("Registering global pages")
 	pages.RegisterGlobalPages(app)
+
+	slog.Info("Adding Swagger")
+	pages.AddSwagger(app)
 
 	startServer(app, config)
 

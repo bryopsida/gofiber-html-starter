@@ -14,3 +14,7 @@ lint:
 	go install golang.org/x/lint/golint@latest
 	golint ./...
 	go vet ./...
+
+update-swagger:
+	go install github.com/swaggo/swag/cmd/swag@latest
+	swag init
