@@ -36,7 +36,7 @@ func NewViperConfig() interfaces.IConfig {
 }
 
 func (c *viperConfig) setDefaults() {
-	c.viper.SetDefault(databasePathkey, path.Join("data", "db"))
+	c.viper.SetDefault(databasePathkey, path.Join("data", "db.sqlite"))
 	c.viper.SetDefault(serverPortKey, 8080)
 	c.viper.SetDefault(serverAddressKey, "localhost")
 	c.viper.SetDefault(serverTLSEnabledKey, false)

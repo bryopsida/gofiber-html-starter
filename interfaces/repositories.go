@@ -23,3 +23,29 @@ type INumberRepository interface {
 	// Returns an error if the delete operation fails
 	DeleteByID(id string) error
 }
+
+// User is a struct to represent a user
+type User struct {
+	ID           uint
+	Username     string
+	Email        string
+	Role         string
+	PasswordHash string
+}
+
+// IUserRepository is an interface for user repositories
+type IUserRepository interface {
+	CreateUser(user *User) error
+	GetUserByID(id uint) (*User, error)
+	GetUserByUsername(username string) (*User, error)
+	UpdateUser(user *User) error
+	DeleteUser(id uint) error
+}
+
+// ISettingsRepository is an interface for settings repositories
+type ISettingsRepository interface {
+	GetString(key string) (string, error)
+	GetInt(key string) (int, error)
+	GetBool(key string) (bool, error)
+	Set(key string, value interface{}) error
+}
