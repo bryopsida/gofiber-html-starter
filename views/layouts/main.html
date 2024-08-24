@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en"  data-bs-theme="dark">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {{ template "bootstrap-styles" . }}
+    <link rel="stylesheet" href="public/global.css">
+    <title>{{ .Title }}</title>
+</head>
+<body>
+    {{ template "partials/header" . }}
+    {{ embed }}
+    {{ template "partials/footer" . }}
+    {{ template "bootstrap-scripts" . }}
+</body>
+</html>

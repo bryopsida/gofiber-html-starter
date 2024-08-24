@@ -2,14 +2,25 @@ package main
 
 import (
 	"context"
+	"embed"
 	"fmt"
 	"log/slog"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/template/pug/v2"
+	"github.com/gofiber/fiber/v2/middleware/cache"
+	"github.com/gofiber/fiber/v2/middleware/compress"
+	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/csrf"
+	"github.com/gofiber/fiber/v2/middleware/etag"
+	"github.com/gofiber/fiber/v2/middleware/filesystem"
+	"github.com/gofiber/fiber/v2/middleware/helmet"
+	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/gofiber/fiber/v2/middleware/requestid"
+	"github.com/gofiber/template/html/v2"
 
 	"github.com/bryopsida/gofiber-pug-starter/config"
 	"github.com/bryopsida/gofiber-pug-starter/datastore"
@@ -20,20 +31,41 @@ import (
 	"github.com/bryopsida/gofiber-pug-starter/services/increment"
 )
 
-func buildConfig(view *pug.Engine) fiber.Config {
+//go:embed public/*
+var embedDirPubic embed.FS
+
+func buildConfig(view fiber.Views) fiber.Config {
 	return fiber.Config{
-		Views: view,
+		Views:       view,
+		ViewsLayout: "layouts/main",
 	}
 }
 
-func buildViewEngine() *pug.Engine {
-	engine := pug.New("./views", ".pug")
-	engine.Load()
+func buildViewEngine() *html.Engine {
+	engine := html.New("./views", ".html")
 	return engine
 }
 
 func buildApp(config fiber.Config) *fiber.App {
 	return fiber.New(config)
+}
+
+func attachMiddleware(app *fiber.App) {
+	app.Use(helmet.New())
+	app.Use(etag.New())
+	app.Use(requestid.New())
+	app.Use(requestid.New())
+	app.Use(cors.New())
+	app.Use(csrf.New())
+	app.Use(compress.New())
+	app.Use(cache.New())
+	app.Use(logger.New())
+	app.Use("/public", filesystem.New(filesystem.Config{
+		Root:       http.FS(embedDirPubic),
+		PathPrefix: "public",
+		Browse:     false,
+	}))
+
 }
 
 func runServer(app *fiber.App, address string) {
@@ -77,6 +109,7 @@ func main() {
 	appViews := buildViewEngine()
 	appConfig := buildConfig(appViews)
 	app := buildApp(appConfig)
+	attachMiddleware(app)
 
 	slog.Info("Registering routes")
 	incrementroutes.RegisterRoutes(app, service)

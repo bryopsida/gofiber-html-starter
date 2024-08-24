@@ -1,0 +1,14 @@
+<br>
+<div class="container">
+    <div class="card">
+        <div class="card-body">
+            <form class="container" action="delete-user?username={{ .Item.Username }}" method="POST">
+                <div class="row">Confirm you wish to delete {{ .Item.Username }}</div>
+                <br>
+                <div class="row">
+                    <input class="btn btn-primary" type="submit" value="Delete User" aria-label="Delete User">
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

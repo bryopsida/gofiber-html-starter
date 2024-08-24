@@ -1,0 +1,36 @@
+<br>
+<div class="container">
+    <div class="card">
+        <div class="card-body">
+            <form class="container" action="edit-user?username={{ .Item.Username }}" method="POST">
+                <div class="row">
+                    <label class="form-label" for="username">Username</label>
+                    <input class="form-control" type="text" placeholder="User" aria-label="User" name="username"
+                        disabled readonly value="{{ .Item.Username }}">
+                </div>
+                <br>
+                <div class="row">
+                    <label class="form-label" for="firstName">First Name</label>
+                    <input class="form-control" type="text" placeholder="First Name" aria-label="First Name"
+                        name="firstName" value="{{ .Item.FirstName }}">
+                </div>
+                <br>
+                <div class="row">
+                    <label class="form-label" for="lastName">Last Name</label>
+                    <input class="form-control" type="text" placeholder="Last Name" aria-label="Last Name"
+                        name="lastName" value="{{ .Item.LastName }}">
+                </div>
+                <br>
+                <div class="row">
+                    <label class="form-label" for="email">Email</label>
+                    <input class="form-control" type="text" placeholder="Email" aria-label="Email" name="email"
+                        value="{{ .Item.Email }}">
+                </div>
+                <br>
+                <div class="row">
+                    <input class="btn btn-primary" type="submit" value="Save" aria-label="Save">
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

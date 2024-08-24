@@ -4,13 +4,12 @@ go 1.22.6
 
 require (
 	github.com/dgraph-io/badger/v4 v4.2.0
+	github.com/gofiber/template/html/v2 v2.1.2
 	github.com/spf13/viper v1.19.0
 	github.com/stretchr/testify v1.9.0
 )
 
 require (
-	github.com/Joker/hpp v1.0.0 // indirect
-	github.com/Joker/jade v1.1.3 // indirect
 	github.com/andybalholm/brotli v1.0.5 // indirect
 	github.com/gofiber/template v1.8.3 // indirect
 	github.com/gofiber/utils v1.1.0 // indirect
@@ -18,7 +17,9 @@ require (
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mattn/go-runewidth v0.0.15 // indirect
+	github.com/philhofer/fwd v1.1.2 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
+	github.com/tinylib/msgp v1.1.8 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasthttp v1.51.0 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect
@@ -31,7 +32,6 @@ require (
 	github.com/dustin/go-humanize v1.0.0 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/gofiber/fiber/v2 v2.52.5
-	github.com/gofiber/template/pug/v2 v2.1.7
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/glog v1.0.0 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect

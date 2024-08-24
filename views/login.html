@@ -1,0 +1,24 @@
+<br>
+<form class="container" action="login" method="POST">
+    <div class="row">
+        <label class="form-label" for="username">Username</label>
+        <input class="{{ if eq .LoginError false }}form-control{{ else }}form-control is-invalid{{ end }}" type="text"
+            placeholder="User" aria-label="User" name="username" required>
+        {{ if .LoginError }}
+        <div class="invalid-feedback" id="usernameFeedback">Please provide a valid username for the password</div>
+        {{ end }}
+    </div>
+    <br>
+    <div class="row">
+        <label class="form-label" for="password">Password</label>
+        <input class="{{ if eq .LoginError false }}form-control{{ else }}form-control is-invalid{{ end }}"
+            type="password" placeholder="Password" aria-label="Password" name="password" required>
+        {{ if .LoginError }}
+        <div class="invalid-feedback" id="passwordFeedback">Please provide a valid password for the username</div>
+        {{ end }}
+    </div>
+    <br>
+    <div class="row">
+        <input class="btn btn-primary" type="submit" value="Login" aria-label="Login">
+    </div>
+</form>

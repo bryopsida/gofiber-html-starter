@@ -1,0 +1,71 @@
+{{ define "content" }}
+    <br>
+    <div class="container">
+        <div class="card">
+            <div class="card-body">
+                <form class="container" action="add-user" method="POST">
+                    <div class="row">
+                        <label class="form-label" for="username">Username</label>
+                        <input class="{{ if not .UsernameError }}form-control{{ else }}form-control is-invalid{{ end }}" value="{{ .UsernameValue }}" type="text" placeholder="Username" aria-label="Username" name="username" required>
+                        {{ if .UsernameError }}
+                            <div class="invalid-feedback" id="usernameFeedback">{{ .UsernameErrorMessage }}</div>
+                        {{ end }}
+                    </div>
+                    <br>
+                    <div class="row">
+                        <label class="form-label" for="firstName">First Name</label>
+                        <input class="{{ if not .FirstNameError }}form-control{{ else }}form-control is-invalid{{ end }}" value="{{ .FirstNameValue }}" type="text" placeholder="First Name" aria-label="First Name" name="firstName">
+                        {{ if .FirstNameError }}
+                            <div class="invalid-feedback" id="firstNameFeedback">{{ .FirstNameErrorMessage }}</div>
+                        {{ end }}
+                    </div>
+                    <br>
+                    <div class="row">
+                        <label class="form-label" for="lastName">Last Name</label>
+                        <input class="{{ if not .LastNameError }}form-control{{ else }}form-control is-invalid{{ end }}" value="{{ .LastNameValue }}" type="text" placeholder="Last Name" aria-label="Last Name" name="lastName">
+                        {{ if .LastNameError }}
+                            <div class="invalid-feedback" id="lastNameFeedback">{{ .LastNameErrorMessage }}</div>
+                        {{ end }}
+                    </div>
+                    <br>
+                    <div class="row">
+                        <label class="form-label" for="role">Role</label>
+                        <select class="form-control" name="role" id="role" aria-label="Role">
+                            <option>Admin</option>
+                            <option>User</option>
+                            <option>Viewer</option>
+                        </select>
+                    </div>
+                    <br>
+                    <div class="row">
+                        <label class="form-label" for="email">Email</label>
+                        <input class="{{ if not .EmailError }}form-control{{ else }}form-control is-invalid{{ end }}" value="{{ .EmailValue }}" type="email" placeholder="Email" aria-label="Email" name="email">
+                        {{ if .EmailError }}
+                            <div class="invalid-feedback" id="emailFeedback">{{ .EmailErrorMessage }}</div>
+                        {{ end }}
+                    </div>
+                    <br>
+                    <div class="row">
+                        <label class="form-label" for="password">Password</label>
+                        <input class="{{ if not .PasswordError }}form-control{{ else }}form-control is-invalid{{ end }}" value="{{ .PasswordValue }}" type="password" placeholder="Password" aria-label="Password" name="password" required>
+                        {{ if .PasswordError }}
+                            <div class="invalid-feedback" id="passwordFeedback">{{ .PasswordErrorMessage }}</div>
+                        {{ end }}
+                    </div>
+                    <br>
+                    <div class="row">
+                        <label class="form-label" for="confirmPassword">Confirm Password</label>
+                        <input class="{{ if not .ConfirmPasswordError }}form-control{{ else }}form-control is-invalid{{ end }}" value="{{ .ConfirmPasswordValue }}" type="password" placeholder="Confirm Password" aria-label="Confirm Password" name="confirmPassword" required>
+                        {{ if .ConfirmPasswordError }}
+                            <div class="invalid-feedback" id="confirmPasswordFeedback">{{ .ConfirmPasswordErrorMessage }}</div>
+                        {{ end }}
+                    </div>
+                    <br>
+                    <div class="row">
+                        <input class="btn btn-primary" type="submit" value="Add User" aria-label="Add User">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{{ end }}
