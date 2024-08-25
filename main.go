@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cache"
@@ -21,11 +22,13 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/helmet"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/requestid"
+	"github.com/gofiber/fiber/v2/utils"
 	"github.com/gofiber/template/html/v2"
 	"github.com/pressly/goose/v3"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 
+	"github.com/bryopsida/gofiber-pug-starter/auth"
 	"github.com/bryopsida/gofiber-pug-starter/config"
 	"github.com/bryopsida/gofiber-pug-starter/database"
 	"github.com/bryopsida/gofiber-pug-starter/database/migrations"
@@ -36,10 +39,10 @@ import (
 	settings_repository "github.com/bryopsida/gofiber-pug-starter/repositories/settings"
 	users_repository "github.com/bryopsida/gofiber-pug-starter/repositories/users"
 	increment_service "github.com/bryopsida/gofiber-pug-starter/services/increment"
+	jwt_service "github.com/bryopsida/gofiber-pug-starter/services/jwt"
 	password_service "github.com/bryopsida/gofiber-pug-starter/services/password"
 	settings_service "github.com/bryopsida/gofiber-pug-starter/services/settings"
-
-	incrementroutes "github.com/bryopsida/gofiber-pug-starter/routes/increment"
+	users_service "github.com/bryopsida/gofiber-pug-starter/services/users"
 )
 
 //go:embed database/migrations/sql/*
@@ -58,6 +61,8 @@ type services struct {
 	IncrementService interfaces.IIncrementService
 	SettingsService  interfaces.ISettingsService
 	PasswordService  interfaces.IPasswordService
+	UsersService     interfaces.IUsersService
+	JWTService       interfaces.IJWTService
 }
 
 func buildConfig(view fiber.Views) fiber.Config {
@@ -83,19 +88,27 @@ func attachMiddleware(app *fiber.App, services *services) {
 		slog.Error("Error getting cookie encryption key", "error", err)
 		panic("failed to get cookie encryption key")
 	}
-
+	app.Use(logger.New())
 	app.Use(helmet.New())
 	app.Use(etag.New())
 	app.Use(requestid.New())
-	app.Use(requestid.New())
 	app.Use(cors.New())
-	app.Use(csrf.New())
+	app.Use(csrf.New(csrf.Config{
+		KeyLookup:         "cookie:csrf_",
+		CookieName:        "csrf_",
+		CookieSameSite:    "Strict",
+		CookieSessionOnly: true,
+		CookieHTTPOnly:    true,
+		Extractor:         csrf.CsrfFromCookie("csrf_"),
+		Expiration:        1 * time.Hour,
+		KeyGenerator:      utils.UUIDv4,
+	}))
 	app.Use(compress.New())
 	app.Use(cache.New())
 	app.Use(encryptcookie.New(encryptcookie.Config{
 		Key: encryptionKey,
 	}))
-	app.Use(logger.New())
+
 	app.Use("/public", filesystem.New(filesystem.Config{
 		Root:       http.FS(embedDirPubic),
 		PathPrefix: "public",
@@ -136,6 +149,7 @@ func initializeDatabase(cfg interfaces.IConfig) *gorm.DB {
 	migrations.InitializeV001Migration(*database.DBConn)
 	migrations.InitializeV002Migration(*database.DBConn)
 	migrations.InitializeV003Migration(*database.DBConn)
+	migrations.InitializeV004Migration(*database.DBConn)
 	err = goose.Up(sqlDb, "database/migrations/sql")
 
 	if err != nil {
@@ -161,6 +175,8 @@ func initializeServices(repos *repositories) *services {
 	services.IncrementService = increment_service.NewIncrementService(repos.NumberRepository, "counter")
 	services.PasswordService = password_service.NewPasswordService()
 	services.SettingsService = settings_service.NewSettingsService(repos.SettingsRepository)
+	services.JWTService = jwt_service.NewJWTService(services.SettingsService)
+	services.UsersService = users_service.NewUsersService(repos.UsersRepository)
 	return services
 }
 
@@ -183,14 +199,13 @@ func main() {
 	app := buildApp(appConfig)
 	attachMiddleware(app, services)
 
-	slog.Info("Registering routes")
-	incrementroutes.RegisterRoutes(app, services.IncrementService)
-
+	auth.RegisterRoutes(app.Group("/api/v1/auth"), services.PasswordService, services.UsersService, services.JWTService)
 	slog.Info("Registering global pages")
 	pages.RegisterGlobalPages(app)
 
 	slog.Info("Adding Swagger")
 	pages.AddSwagger(app)
+	auth.AddJWTAuth(app, services.SettingsService)
 
 	startServer(app, config)
 

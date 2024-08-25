@@ -1,5 +1,5 @@
 <br>
-<form class="container" action="login" method="POST">
+<form class="container" action="/api/v1/auth/login" method="POST">
     <div class="row">
         <label class="form-label" for="username">Username</label>
         <input class="{{ if eq .LoginError false }}form-control{{ else }}form-control is-invalid{{ end }}" type="text"

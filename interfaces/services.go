@@ -1,5 +1,7 @@
 package interfaces
 
+import "github.com/golang-jwt/jwt/v5"
+
 // IIncrementService is an interface for incrementing numbers
 type IIncrementService interface {
 	// Increment increments a number
@@ -45,4 +47,40 @@ type ISettingsService interface {
 	// - value: the value to set
 	// Returns an error if the set operation fails
 	SetBool(key string, value bool) error
+}
+
+// IUsersService is an interface for user operations
+type IUsersService interface {
+	// CreateUser creates a new user
+	// - user: the user to create
+	// Returns an error if the create operation fails
+	CreateUser(user *User) error
+	// GetUserByID gets a user by ID
+	// - id: the ID of the user to get
+	// Returns the user if found, otherwise returns an error
+	GetUserByID(id uint) (*User, error)
+	// GetUserByUsername gets a user by username
+	// - username: the username of the user to get
+	// Returns the user if found, otherwise returns an error
+	GetUserByUsername(username string) (*User, error)
+	// UpdateUser updates a user
+	// - user: the user to update
+	// Returns an error if the update operation fails
+	UpdateUser(user *User) error
+	// DeleteUser deletes a user by ID
+	// - id: the ID of the user to delete
+	// Returns an error if the delete operation fails
+	DeleteUser(id uint) error
+}
+
+// IJWTService is an interface for JWT operations
+type IJWTService interface {
+	// Generate generates a JWT token for a user
+	// - user: the user to generate a token for
+	// Returns the generated token if successful, otherwise returns an error
+	Generate(user *User) (string, error)
+	// Validate validates a JWT token
+	// - token: the token to validate
+	// Returns the token if valid, otherwise returns an error
+	Validate(token string) (*jwt.Token, error)
 }
