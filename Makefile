@@ -18,3 +18,5 @@ lint:
 update-swagger:
 	go install github.com/swaggo/swag/cmd/swag@latest
 	swag init
+dev:
+	npx nodemon --exec go run main.go --signal SIGTERM

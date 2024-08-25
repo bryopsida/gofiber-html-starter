@@ -13,7 +13,6 @@ import (
 
 // V002Migration represents the second migration, adds a cookie encryption key to the settings table
 type V002Migration struct {
-	gorm.Migrator
 	gorm.DB
 }
 

@@ -180,6 +180,26 @@ func initializeServices(repos *repositories) *services {
 	return services
 }
 
+func addPublicRoutes(app *fiber.App, services *services) {
+	apiV1Router := app.Group("/api/v1")
+	auth.RegisterPublicRoutes(apiV1Router.Group("/auth"), services.PasswordService, services.UsersService, services.JWTService)
+}
+func addPublicPages(app *fiber.App) {
+	pages.RegisterGlobalPages(app)
+	pages.AddSwagger(app)
+}
+
+func addPrivateRoutes(app *fiber.App, services *services) {
+	apiV1Router := app.Group("/api/v1")
+	auth.RegisterPrivateRoutes(apiV1Router.Group("/auth"), services.PasswordService, services.UsersService, services.JWTService)
+}
+func addPrivatePages(app *fiber.App) {
+	pages.RegisterPrivateGlobalPages(app)
+}
+
+func addAuthMiddleware(app *fiber.App, services *services) {
+	auth.AddJWTAuth(app, services.SettingsService)
+}
 func main() {
 	slog.Info("Starting")
 	config := config.NewViperConfig()
@@ -198,14 +218,11 @@ func main() {
 	appConfig := buildConfig(appViews)
 	app := buildApp(appConfig)
 	attachMiddleware(app, services)
-
-	auth.RegisterRoutes(app.Group("/api/v1/auth"), services.PasswordService, services.UsersService, services.JWTService)
-	slog.Info("Registering global pages")
-	pages.RegisterGlobalPages(app)
-
-	slog.Info("Adding Swagger")
-	pages.AddSwagger(app)
-	auth.AddJWTAuth(app, services.SettingsService)
+	addPublicRoutes(app, services)
+	addPublicPages(app)
+	addAuthMiddleware(app, services)
+	addPrivateRoutes(app, services)
+	addPrivatePages(app)
 
 	startServer(app, config)
 

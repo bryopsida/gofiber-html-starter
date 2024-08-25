@@ -68,11 +68,18 @@ func (a *authRoutes) LogoutHandler(c *fiber.Ctx) error {
 	return nil
 }
 
-func RegisterRoutes(router fiber.Router, passwordService interfaces.IPasswordService, userService interfaces.IUsersService, jwtService interfaces.IJWTService) {
-	slog.Info("Adding auth routes", "router", router)
+func RegisterPublicRoutes(router fiber.Router, passwordService interfaces.IPasswordService, userService interfaces.IUsersService, jwtService interfaces.IJWTService) {
+	slog.Info("Adding public auth routes", "router", router)
 	authRoutes := authRoutes{passwordService: passwordService, userService: userService, jwtService: jwtService}
 
 	router.Post("/login", authRoutes.LoginHandler)
+
+}
+
+func RegisterPrivateRoutes(router fiber.Router, passwordService interfaces.IPasswordService, userService interfaces.IUsersService, jwtService interfaces.IJWTService) {
+	slog.Info("Adding private auth routes", "router", router)
+	authRoutes := authRoutes{passwordService: passwordService, userService: userService, jwtService: jwtService}
+
 	router.Post("/logout", authRoutes.LogoutHandler)
 
 }
@@ -85,5 +92,10 @@ func AddJWTAuth(app *fiber.App, settingsService interfaces.ISettingsService) {
 	}
 	app.Use(jwtware.New(jwtware.Config{
 		SigningKey: jwtware.SigningKey{Key: []byte(signingKey)},
+		ErrorHandler: func(c *fiber.Ctx, err error) error {
+			slog.Error("JWT Error", "error", err)
+			return c.Redirect("/login")
+		},
+		TokenLookup: "cookie:app_user",
 	}))
 }
