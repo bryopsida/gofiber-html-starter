@@ -28,6 +28,35 @@ func NewJWTService(settings interfaces.ISettingsService) interfaces.IJWTService 
 	}
 }
 
+func (s *jwtService) UserFromClaims(ctx interfaces.IRequestContext) (*interfaces.User, error) {
+	userLocal := ctx.Locals("user")
+	if userLocal == nil {
+		return nil, nil
+	}
+	userToken := ctx.Locals("user").(*jwt.Token)
+	if userToken == nil {
+		return nil, nil
+	}
+	claims := userToken.Claims.(jwt.MapClaims)
+	if claims == nil {
+		return nil, nil
+	}
+	retUser := &interfaces.User{}
+	if username, ok := claims["username"].(string); ok {
+		retUser.Username = username
+	}
+	if email, ok := claims["email"].(string); ok {
+		retUser.Email = email
+	}
+	if role, ok := claims["role"].(string); ok {
+		retUser.Role = role
+	}
+	if id, ok := claims["sub"].(uint); ok {
+		retUser.ID = id
+	}
+	return retUser, nil
+}
+
 func (s *jwtService) Generate(user *interfaces.User) (string, error) {
 	claims := jwt.MapClaims{
 		"iss":      s.issuer,

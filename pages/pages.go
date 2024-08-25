@@ -1,6 +1,7 @@
 package pages
 
 import (
+	"github.com/bryopsida/gofiber-pug-starter/interfaces"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -28,10 +29,12 @@ func RegisterGlobalPages(app *fiber.App) {
 	})
 }
 
-func RegisterPrivateGlobalPages(app *fiber.App) {
+func RegisterPrivateGlobalPages(app *fiber.App, jwtService interfaces.IJWTService) {
 	app.Get("/", func(c *fiber.Ctx) error {
+		userObj, _ := jwtService.UserFromClaims(c)
 		return c.Render("index", fiber.Map{
 			"cardRows": []fiber.Map{},
+			"User":     userObj,
 		})
 	})
 

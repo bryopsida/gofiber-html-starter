@@ -19,12 +19,13 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/encryptcookie"
 	"github.com/gofiber/fiber/v2/middleware/etag"
 	"github.com/gofiber/fiber/v2/middleware/filesystem"
+	"github.com/gofiber/fiber/v2/middleware/healthcheck"
 	"github.com/gofiber/fiber/v2/middleware/helmet"
-	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/requestid"
 	"github.com/gofiber/fiber/v2/utils"
 	"github.com/gofiber/template/html/v2"
 	"github.com/pressly/goose/v3"
+	slogfiber "github.com/samber/slog-fiber"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 
@@ -67,8 +68,10 @@ type services struct {
 
 func buildConfig(view fiber.Views) fiber.Config {
 	return fiber.Config{
-		Views:       view,
-		ViewsLayout: "layouts/main",
+		Views:                 view,
+		ViewsLayout:           "layouts/main",
+		PassLocalsToViews:     true,
+		DisableStartupMessage: true,
 	}
 }
 
@@ -88,7 +91,7 @@ func attachMiddleware(app *fiber.App, services *services) {
 		slog.Error("Error getting cookie encryption key", "error", err)
 		panic("failed to get cookie encryption key")
 	}
-	app.Use(logger.New())
+	app.Use(slogfiber.New(slog.Default()))
 	app.Use(helmet.New())
 	app.Use(etag.New())
 	app.Use(requestid.New())
@@ -108,6 +111,7 @@ func attachMiddleware(app *fiber.App, services *services) {
 	app.Use(encryptcookie.New(encryptcookie.Config{
 		Key: encryptionKey,
 	}))
+	app.Use(healthcheck.New())
 
 	app.Use("/public", filesystem.New(filesystem.Config{
 		Root:       http.FS(embedDirPubic),
@@ -193,14 +197,18 @@ func addPrivateRoutes(app *fiber.App, services *services) {
 	apiV1Router := app.Group("/api/v1")
 	auth.RegisterPrivateRoutes(apiV1Router.Group("/auth"), services.PasswordService, services.UsersService, services.JWTService)
 }
-func addPrivatePages(app *fiber.App) {
-	pages.RegisterPrivateGlobalPages(app)
+func addPrivatePages(app *fiber.App, services *services) {
+	pages.RegisterPrivateGlobalPages(app, services.JWTService)
 }
 
 func addAuthMiddleware(app *fiber.App, services *services) {
 	auth.AddJWTAuth(app, services.SettingsService)
 }
 func main() {
+	defaultLogger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
+		Level: slog.LevelDebug,
+	}))
+	slog.SetDefault(defaultLogger)
 	slog.Info("Starting")
 	config := config.NewViperConfig()
 	slog.Info("Getting database")
@@ -222,7 +230,7 @@ func main() {
 	addPublicPages(app)
 	addAuthMiddleware(app, services)
 	addPrivateRoutes(app, services)
-	addPrivatePages(app)
+	addPrivatePages(app, services)
 
 	startServer(app, config)
 

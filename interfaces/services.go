@@ -1,6 +1,8 @@
 package interfaces
 
-import "github.com/golang-jwt/jwt/v5"
+import (
+	"github.com/golang-jwt/jwt/v5"
+)
 
 // IIncrementService is an interface for incrementing numbers
 type IIncrementService interface {
@@ -83,4 +85,6 @@ type IJWTService interface {
 	// - token: the token to validate
 	// Returns the token if valid, otherwise returns an error
 	Validate(token string) (*jwt.Token, error)
+
+	UserFromClaims(ctx IRequestContext) (*User, error)
 }
