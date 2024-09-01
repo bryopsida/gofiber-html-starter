@@ -185,8 +185,7 @@ func initializeServices(repos *repositories) *services {
 }
 
 func addPublicRoutes(app *fiber.App, services *services) {
-	apiV1Router := app.Group("/api/v1")
-	auth.RegisterPublicRoutes(apiV1Router.Group("/auth"), services.PasswordService, services.UsersService, services.JWTService)
+	auth.RegisterPublicRoutes(app.Group("/auth"), services.PasswordService, services.UsersService, services.JWTService)
 }
 func addPublicPages(app *fiber.App) {
 	pages.RegisterGlobalPages(app)
@@ -194,8 +193,7 @@ func addPublicPages(app *fiber.App) {
 }
 
 func addPrivateRoutes(app *fiber.App, services *services) {
-	apiV1Router := app.Group("/api/v1")
-	auth.RegisterPrivateRoutes(apiV1Router.Group("/auth"), services.PasswordService, services.UsersService, services.JWTService)
+	auth.RegisterPrivateRoutes(app.Group("/auth"), services.PasswordService, services.UsersService, services.JWTService)
 }
 func addPrivatePages(app *fiber.App, services *services) {
 	pages.RegisterPrivateGlobalPages(app, services.JWTService)

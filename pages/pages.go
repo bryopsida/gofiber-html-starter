@@ -9,7 +9,10 @@ import (
 // - app: *fiber.App fiber app
 func RegisterGlobalPages(app *fiber.App) {
 	app.Get("/login", func(c *fiber.Ctx) error {
-		return c.Render("login", fiber.Map{})
+		loginError := c.Query("loginError") == "true"
+		return c.Render("login", fiber.Map{
+			"LoginError": loginError,
+		})
 	})
 
 	app.Get("/404", func(c *fiber.Ctx) error {

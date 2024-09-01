@@ -19,15 +19,6 @@ type LoginRequest struct {
 	Password string `json:"password"`
 }
 
-// @Summary Login
-// @Description Logs in a user and returns a JWT token
-// @Tags auth
-// @Accept application/x-www-form-urlencoded
-// @Produce json
-// @Param login body LoginRequest true "Login credentials"
-// @Success 200 {object} map[string]string "token"
-// @Failure 500 {object} map[string]string "error"
-// @Router /api/v1/auth/login [post]
 func (a *authRoutes) LoginHandler(c *fiber.Ctx) error {
 	user := c.FormValue("username")
 	pass := c.FormValue("password")
@@ -35,18 +26,21 @@ func (a *authRoutes) LoginHandler(c *fiber.Ctx) error {
 	dbUser, err := a.userService.GetUserByUsername(user)
 	if err != nil {
 		slog.Info("Failed login attempt for user", "user", user)
-		return c.SendStatus(fiber.StatusUnauthorized)
+		c.Redirect("/login?loginError=true")
+		return nil
 	}
 	validPass, err := a.passwordService.Verify(pass, dbUser.PasswordHash)
 	if err != nil || !validPass {
 		slog.Info("Invalid login credentials provided for user", "user", user)
-		return c.SendStatus(fiber.StatusUnauthorized)
+		c.Redirect("/login?loginError=true")
+		return nil
 	}
 	// Create the Claims
 	token, err := a.jwtService.Generate(dbUser)
 	if err != nil {
 		slog.Error("Failed to generate token", "error", err)
-		return c.SendStatus(fiber.StatusInternalServerError)
+		c.Redirect("/login?loginError=true")
+		return nil
 	}
 	// stick the token in the cookie
 	c.Cookie(&fiber.Cookie{
@@ -55,15 +49,10 @@ func (a *authRoutes) LoginHandler(c *fiber.Ctx) error {
 		SameSite: "Strict",
 		HTTPOnly: true,
 	})
-	// return it as well so it can be supplied in header
-	return c.JSON(fiber.Map{"token": token})
+	c.Redirect("/")
+	return nil
 }
 
-// @Summary Logout
-// @Description Close session
-// @Tags auth
-// @Success 200 {string} string "ok"
-// @Router /api/v1/auth/logout [post]
 func (a *authRoutes) LogoutHandler(c *fiber.Ctx) error {
 	return nil
 }
