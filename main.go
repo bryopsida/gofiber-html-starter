@@ -197,6 +197,7 @@ func addPrivateRoutes(app *fiber.App, services *services) {
 }
 func addPrivatePages(app *fiber.App, services *services) {
 	pages.RegisterPrivateGlobalPages(app, services.JWTService)
+	pages.RegisterPrivateUserPages(app, services.UsersService, services.PasswordService)
 }
 
 func addAuthMiddleware(app *fiber.App, services *services) {

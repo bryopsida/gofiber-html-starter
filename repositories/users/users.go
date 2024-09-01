@@ -29,6 +29,7 @@ func NewUserRepository(db *gorm.DB) interfaces.IUserRepository {
 
 func (userRepository) FromDTO(userDTO interfaces.User) user {
 	return user{
+		ID:           userDTO.ID,
 		Username:     userDTO.Username,
 		Email:        userDTO.Email,
 		Role:         userDTO.Role,
