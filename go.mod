@@ -3,11 +3,11 @@ module github.com/bryopsida/gofiber-pug-starter
 go 1.22.6
 
 require (
-	github.com/gofiber/template/html/v2 v2.1.2
+	github.com/gofiber/template/html/v2 v2.1.3
 	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/samber/slog-fiber v1.16.2
 	github.com/spf13/viper v1.19.0
-	github.com/stretchr/testify v1.9.0
+	github.com/stretchr/testify v1.10.0
 	github.com/swaggo/swag v1.16.3
 )
 
