@@ -1,6 +1,6 @@
 module github.com/bryopsida/gofiber-pug-starter
 
-go 1.22.6
+go 1.24
 
 require (
 	github.com/gofiber/template/html/v2 v2.1.2
@@ -55,7 +55,7 @@ require (
 	github.com/gofiber/fiber/v2 v2.52.5
 	github.com/gofiber/swagger v1.1.0
 	github.com/hashicorp/hcl v1.0.0 // indirect
-	github.com/klauspost/compress v1.17.2 // indirect
+	github.com/klauspost/compress v1.18.7 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/pelletier/go-toml/v2 v2.2.2 // indirect
